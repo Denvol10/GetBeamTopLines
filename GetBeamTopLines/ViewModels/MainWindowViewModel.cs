@@ -54,7 +54,32 @@ namespace GetBeamTopLines.ViewModels
         }
         #endregion
 
+        #region Id выбранной грани
+        private int _selectFaceId;
+        public int SelectFaceId
+        {
+            get => _selectFaceId;
+            set => Set(ref _selectFaceId, value);
+        }
+        #endregion
+
         #region Команды
+
+        #region Выбрать верхнюю грань балок
+        public ICommand SelectBeamFaceCommand { get; }
+
+        private void OnSelectBeamFaceCommandExecuted(object parameter)
+        {
+            RevitCommand.mainView.Hide();
+            RevitModel.GetFaceIdBySelection();
+            RevitCommand.mainView.ShowDialog();
+        }
+
+        private bool CanSelectBeamFaceCommandExecute(object parameter)
+        {
+            return true;
+        }
+        #endregion
 
         #region Сохранить линии верха балок в файл
         public ICommand SaveBeamLinesCommand { get; }
@@ -62,6 +87,7 @@ namespace GetBeamTopLines.ViewModels
         private void OnSaveBeamLinesCommandExecuted(object parameter)
         {
             RevitModel.GetFamilyInstanceByFamilySymbol(FamilySymbolName);
+
         }
 
         private bool CanSaveBeamLinesCommandExecute(object parameter)
@@ -81,6 +107,8 @@ namespace GetBeamTopLines.ViewModels
             StructuralFramingFamilySymbols = RevitModel.GetFamilySymbolNames();
 
             #region Команды
+
+            SelectBeamFaceCommand = new LambdaCommand(OnSelectBeamFaceCommandExecuted, CanSelectBeamFaceCommandExecute);
 
             SaveBeamLinesCommand = new LambdaCommand(OnSaveBeamLinesCommandExecuted, CanSaveBeamLinesCommandExecute);
 

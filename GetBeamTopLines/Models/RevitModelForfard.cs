@@ -32,6 +32,13 @@ namespace GetBeamTopLines
 
         private List<FamilyInstance> BeamInstances { get; set; }
 
+        private int _selectedFaceId;
+        private int SelectedFaceId
+        {
+            get => _selectedFaceId;
+            set => _selectedFaceId = value;
+        }
+
         #region Получение списка названий типоразмеров семейств
         public ObservableCollection<FamilySymbolSelector> GetFamilySymbolNames()
         {
@@ -65,14 +72,7 @@ namespace GetBeamTopLines
 
             var selectBeamElements = structuralFramingElements.Where(e => e.Symbol.Id.IntegerValue == familySymbol.Id.IntegerValue);
 
-            string resultPath = @"O:\Revit Infrastructure Tools\GetBeamTopLines\GetBeamTopLines\result.txt";
-            using(StreamWriter sw = new StreamWriter(resultPath, false, Encoding.Default))
-            {
-                foreach(var elem in selectBeamElements)
-                {
-                    sw.WriteLine(elem.Name);
-                }
-            }
+            BeamInstances = selectBeamElements.ToList();
         }
         #endregion
 
@@ -95,6 +95,23 @@ namespace GetBeamTopLines
                 }
             }
             return null;
+        }
+        #endregion
+
+        #region Получение Id выбранной грани
+        public void GetFaceIdBySelection()
+        {
+            Selection sel = Uiapp.ActiveUIDocument.Selection;
+            Reference selectedFace = sel.PickObject(ObjectType.Face, "Выберете верх балки");
+            string stableRepresentation = selectedFace.ConvertToStableRepresentation(Doc);
+            string[] representInfo = stableRepresentation.Split(':');
+            SelectedFaceId = int.Parse(representInfo.ElementAt(representInfo.Length - 2));
+
+            string resultPath = @"O:\Revit Infrastructure Tools\GetBeamTopLines\GetBeamTopLines\result.txt";
+            using(StreamWriter sw = new StreamWriter(resultPath, false, Encoding.Default))
+            {
+                sw.WriteLine(SelectedFaceId);
+            }
         }
         #endregion
     }

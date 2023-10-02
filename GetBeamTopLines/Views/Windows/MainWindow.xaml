@@ -84,7 +84,7 @@
                     <TextBlock Text="Верхняя грань балки"
                                Style="{StaticResource TextAboveButton}" />
                     <Button Style="{StaticResource SelectButton}"
-                            Command="{Binding SaveBeamLinesCommand}" />
+                            Command="{Binding SelectBeamFaceCommand}" />
                 </UniformGrid>
             </UniformGrid>
         </GroupBox>

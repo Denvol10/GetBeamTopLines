@@ -12,6 +12,7 @@ using Autodesk.Revit.DB.Architecture;
 using System.Collections.ObjectModel;
 using GetBeamTopLines.Models;
 using System.IO;
+using Microsoft.Win32;
 
 namespace GetBeamTopLines
 {
@@ -90,7 +91,7 @@ namespace GetBeamTopLines
         #region Получение гранией экземпляров балок
         public void GetBeamTopLines()
         {
-            var lines = new List<Curve>();
+            var lines = new List<List<Curve>>();
 
             foreach (var beam in BeamInstances)
             {
@@ -98,17 +99,35 @@ namespace GetBeamTopLines
                 var curveLoop = topFace.GetEdgesAsCurveLoops();
                 foreach (IEnumerable<Curve> loop in curveLoop)
                 {
-                    lines.AddRange(loop);
+                    lines.Add(loop.ToList());
                 }
             }
 
-            string resultPath = @"O:\Revit Infrastructure Tools\GetBeamTopLines\GetBeamTopLines\result.txt";
-            using (StreamWriter sw = new StreamWriter(resultPath, false, Encoding.Default))
+            var familyPath = GetFamilyDocumentPath();
+
+            var familyDocument = App.OpenDocumentFile(familyPath);
+            ElementId categoryId = new ElementId(BuiltInCategory.OST_Lines);
+
+            using (Transaction trans = new Transaction(familyDocument, "Create lines"))
             {
-                foreach(var line in lines)
+                trans.Start();
+                foreach(var beamLines in lines)
                 {
-                    sw.WriteLine(line);
+                    var lineList = new List<GeometryObject>();
+                    lineList.AddRange(beamLines);
+                    DirectShape directShape = DirectShape.CreateElement(familyDocument, categoryId);
+                    if (directShape.IsValidShape(lineList))
+                    {
+                        directShape.SetShape(lineList);
+                    }
                 }
+                trans.Commit();
+            }
+
+            var uiFamilyDocument = new UIDocument(familyDocument);
+            if (uiFamilyDocument.GetOpenUIViews().Count == 0)
+            {
+                familyDocument.Close();
             }
         }
         #endregion
@@ -154,6 +173,20 @@ namespace GetBeamTopLines
             }
 
             return null;
+        }
+
+        private string GetFamilyDocumentPath()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Revit family files (*.rfa)|*.rfa";
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                string familyPath = openFileDialog.FileName;
+                return familyPath;
+            }
+
+            return string.Empty;
         }
     }
 }

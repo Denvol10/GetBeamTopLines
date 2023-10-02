@@ -68,6 +68,31 @@
         </Style>
     </Window.Resources>
     <StackPanel>
-        
+        <GroupBox Header="Балки"
+                  Style="{StaticResource BorderGroupStyle}">
+            <UniformGrid Columns="2"
+                         Grid.Row="0">
+                <UniformGrid Rows="2">
+                    <TextBlock Text="Тип балки"
+                               Style="{StaticResource TextAboveButton}" />
+                    <ComboBox Width="150"
+                              Margin="0,2,0,0"
+                              ItemsSource="{Binding StructuralFramingFamilySymbols}"
+                              SelectedItem="{Binding FamilySymbolName}" />
+                </UniformGrid>
+                <UniformGrid Rows="2">
+                    <CheckBox Content="Развернуть профиль"
+                              VerticalAlignment="Center"
+                              HorizontalAlignment="Left"
+                              Margin="10,5,0,0"
+                              IsChecked="{Binding IsRotate}" />
+                    <CheckBox Content="Вертикально"
+                              VerticalAlignment="Center"
+                              HorizontalAlignment="Left"
+                              Margin="10,5,0,0"
+                              IsChecked="{Binding IsVertical}" />
+                </UniformGrid>
+            </UniformGrid>
+        </GroupBox>
     </StackPanel>
 </Window>

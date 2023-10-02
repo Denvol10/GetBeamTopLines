@@ -10,6 +10,7 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using Autodesk.Revit.DB.Architecture;
 using System.Collections.ObjectModel;
+using GetBeamTopLines.Models;
 
 namespace GetBeamTopLines
 {
@@ -28,7 +29,28 @@ namespace GetBeamTopLines
             Doc = uiapp.ActiveUIDocument.Document;
         }
 
+        #region Список названий типоразмеров семейств
+        public ObservableCollection<FamilySymbolSelector> GetFamilySymbolNames()
+        {
+            var familySymbolNames = new ObservableCollection<FamilySymbolSelector>();
+            var allFamilies = new FilteredElementCollector(Doc).OfClass(typeof(Family)).OfType<Family>();
+            var structuralFramingFamilies = allFamilies.Where(f => f.FamilyCategory.Id.IntegerValue
+                                                              == (int)BuiltInCategory.OST_StructuralFraming);
+            if (structuralFramingFamilies.Count() == 0)
+                return familySymbolNames;
 
+            foreach (var family in structuralFramingFamilies)
+            {
+                foreach (var symbolId in family.GetFamilySymbolIds())
+                {
+                    var familySymbol = Doc.GetElement(symbolId);
+                    familySymbolNames.Add(new FamilySymbolSelector(family.Name, familySymbol.Name));
+                }
+            }
+
+            return familySymbolNames;
+        }
+        #endregion
 
     }
 }

@@ -76,7 +76,42 @@ namespace GetBeamTopLines
         }
         #endregion
 
+        #region Получение Id выбранной грани
+        public void GetFaceIdBySelection()
+        {
+            Selection sel = Uiapp.ActiveUIDocument.Selection;
+            Reference selectedFace = sel.PickObject(ObjectType.Face, "Выберете верх балки");
+            string stableRepresentation = selectedFace.ConvertToStableRepresentation(Doc);
+            string[] representInfo = stableRepresentation.Split(':');
+            SelectedFaceId = int.Parse(representInfo.ElementAt(representInfo.Length - 2));
+        }
+        #endregion
 
+        #region Получение гранией экземпляров балок
+        public void GetBeamTopLines()
+        {
+            var lines = new List<Curve>();
+
+            foreach (var beam in BeamInstances)
+            {
+                var topFace = GetFaceById(beam);
+                var curveLoop = topFace.GetEdgesAsCurveLoops();
+                foreach (IEnumerable<Curve> loop in curveLoop)
+                {
+                    lines.AddRange(loop);
+                }
+            }
+
+            string resultPath = @"O:\Revit Infrastructure Tools\GetBeamTopLines\GetBeamTopLines\result.txt";
+            using (StreamWriter sw = new StreamWriter(resultPath, false, Encoding.Default))
+            {
+                foreach(var line in lines)
+                {
+                    sw.WriteLine(line);
+                }
+            }
+        }
+        #endregion
 
         #region Получение типоразмера по имени
         private FamilySymbol GetFamilySymbolByName(FamilySymbolSelector familyAndSymbolName)
@@ -98,21 +133,27 @@ namespace GetBeamTopLines
         }
         #endregion
 
-        #region Получение Id выбранной грани
-        public void GetFaceIdBySelection()
+        private Face GetFaceById(FamilyInstance beam)
         {
-            Selection sel = Uiapp.ActiveUIDocument.Selection;
-            Reference selectedFace = sel.PickObject(ObjectType.Face, "Выберете верх балки");
-            string stableRepresentation = selectedFace.ConvertToStableRepresentation(Doc);
-            string[] representInfo = stableRepresentation.Split(':');
-            SelectedFaceId = int.Parse(representInfo.ElementAt(representInfo.Length - 2));
-
-            string resultPath = @"O:\Revit Infrastructure Tools\GetBeamTopLines\GetBeamTopLines\result.txt";
-            using(StreamWriter sw = new StreamWriter(resultPath, false, Encoding.Default))
+            Options options = new Options();
+            var beamGeometry = beam.get_Geometry(options);
+            var beamGeometryInstance = beamGeometry.OfType<GeometryInstance>().First();
+            var faceArrays = beamGeometryInstance.GetInstanceGeometry().OfType<Solid>().Where(s => s.Id != -1).Select(s => s.Faces);
+            foreach (var faceArray in faceArrays)
             {
-                sw.WriteLine(SelectedFaceId);
+                foreach (var faceObject in faceArray)
+                {
+                    if (faceObject is Face face)
+                    {
+                        if (face.Id == SelectedFaceId)
+                        {
+                            return face;
+                        }
+                    }
+                }
             }
+
+            return null;
         }
-        #endregion
     }
 }

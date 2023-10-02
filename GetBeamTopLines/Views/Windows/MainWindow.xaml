@@ -81,16 +81,10 @@
                               SelectedItem="{Binding FamilySymbolName}" />
                 </UniformGrid>
                 <UniformGrid Rows="2">
-                    <CheckBox Content="Развернуть профиль"
-                              VerticalAlignment="Center"
-                              HorizontalAlignment="Left"
-                              Margin="10,5,0,0"
-                              IsChecked="{Binding IsRotate}" />
-                    <CheckBox Content="Вертикально"
-                              VerticalAlignment="Center"
-                              HorizontalAlignment="Left"
-                              Margin="10,5,0,0"
-                              IsChecked="{Binding IsVertical}" />
+                    <TextBlock Text="Верхняя грань балки"
+                               Style="{StaticResource TextAboveButton}" />
+                    <Button Style="{StaticResource SelectButton}"
+                            Command="{Binding SaveBeamLinesCommand}" />
                 </UniformGrid>
             </UniformGrid>
         </GroupBox>

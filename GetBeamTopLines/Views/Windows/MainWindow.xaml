@@ -94,5 +94,18 @@
                 </UniformGrid>
             </UniformGrid>
         </GroupBox>
+        <GroupBox Header="Сохранение линий"
+                  Style="{StaticResource BorderGroupStyle}">
+            <UniformGrid Grid.Row="2"
+                         Columns="2"
+                         Margin="0,12,0,5">
+                <Button Content="Сохранить"
+                        Style="{StaticResource SelectButton}"
+                        Command="{Binding SaveBeamLinesCommand}" />
+                <Button Content="Отмена"
+                        Style="{StaticResource SelectButton}"
+                        Command="{Binding CloseWindow}" />
+            </UniformGrid>
+        </GroupBox>
     </StackPanel>
 </Window>

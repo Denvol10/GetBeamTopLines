@@ -11,6 +11,7 @@ using Autodesk.Revit.UI.Selection;
 using Autodesk.Revit.DB.Architecture;
 using System.Collections.ObjectModel;
 using GetBeamTopLines.Models;
+using System.IO;
 
 namespace GetBeamTopLines
 {
@@ -29,7 +30,9 @@ namespace GetBeamTopLines
             Doc = uiapp.ActiveUIDocument.Document;
         }
 
-        #region Список названий типоразмеров семейств
+        private List<FamilyInstance> BeamInstances { get; set; }
+
+        #region Получение списка названий типоразмеров семейств
         public ObservableCollection<FamilySymbolSelector> GetFamilySymbolNames()
         {
             var familySymbolNames = new ObservableCollection<FamilySymbolSelector>();
@@ -52,5 +55,47 @@ namespace GetBeamTopLines
         }
         #endregion
 
+        #region Получение всех экземпляров семейств выбранного типоразмера
+        public void GetFamilyInstanceByFamilySymbol(FamilySymbolSelector familySymbolName)
+        {
+            FamilySymbol familySymbol = GetFamilySymbolByName(familySymbolName);
+            var structuralFramingElements = new FilteredElementCollector(Doc).OfCategory(BuiltInCategory.OST_StructuralFraming)
+                                                                             .ToElements()
+                                                                             .OfType<FamilyInstance>();
+
+            var selectBeamElements = structuralFramingElements.Where(e => e.Symbol.Id.IntegerValue == familySymbol.Id.IntegerValue);
+
+            string resultPath = @"O:\Revit Infrastructure Tools\GetBeamTopLines\GetBeamTopLines\result.txt";
+            using(StreamWriter sw = new StreamWriter(resultPath, false, Encoding.Default))
+            {
+                foreach(var elem in selectBeamElements)
+                {
+                    sw.WriteLine(elem.Name);
+                }
+            }
+        }
+        #endregion
+
+
+
+        #region Получение типоразмера по имени
+        private FamilySymbol GetFamilySymbolByName(FamilySymbolSelector familyAndSymbolName)
+        {
+            var familyName = familyAndSymbolName.FamilyName;
+            var symbolName = familyAndSymbolName.SymbolName;
+
+            Family family = new FilteredElementCollector(Doc).OfClass(typeof(Family)).Where(f => f.Name == familyName).First() as Family;
+            var symbolIds = family.GetFamilySymbolIds();
+            foreach (var symbolId in symbolIds)
+            {
+                FamilySymbol fSymbol = (FamilySymbol)Doc.GetElement(symbolId);
+                if (fSymbol.get_Parameter(BuiltInParameter.SYMBOL_NAME_PARAM).AsString() == symbolName)
+                {
+                    return fSymbol;
+                }
+            }
+            return null;
+        }
+        #endregion
     }
 }

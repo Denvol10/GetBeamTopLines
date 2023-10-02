@@ -56,6 +56,20 @@ namespace GetBeamTopLines.ViewModels
 
         #region Команды
 
+        #region Сохранить линии верха балок в файл
+        public ICommand SaveBeamLinesCommand { get; }
+
+        private void OnSaveBeamLinesCommandExecuted(object parameter)
+        {
+            RevitModel.GetFamilyInstanceByFamilySymbol(FamilySymbolName);
+        }
+
+        private bool CanSaveBeamLinesCommandExecute(object parameter)
+        {
+            return true;
+        }
+        #endregion
+
         #endregion
 
 
@@ -67,6 +81,8 @@ namespace GetBeamTopLines.ViewModels
             StructuralFramingFamilySymbols = RevitModel.GetFamilySymbolNames();
 
             #region Команды
+
+            SaveBeamLinesCommand = new LambdaCommand(OnSaveBeamLinesCommandExecuted, CanSaveBeamLinesCommandExecute);
 
             #endregion
         }

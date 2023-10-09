@@ -98,7 +98,7 @@
                         Command="{Binding SaveBeamLinesCommand}" />
                 <Button Content="Отмена"
                         Style="{StaticResource SelectButton}"
-                        Command="{Binding CloseWindow}" />
+                        Command="{Binding CloseWindowCommand}" />
             </UniformGrid>
         </GroupBox>
     </StackPanel>

@@ -98,6 +98,20 @@ namespace GetBeamTopLines.ViewModels
         }
         #endregion
 
+        #region Закрыть окно
+        public ICommand CloseWindowCommand { get; }
+
+        private void OnCloseWindowCommandExecuted(object parameter)
+        {
+            RevitCommand.mainView.Close();
+        }
+
+        private bool CanCloseWindowCommandExecute(object parameter)
+        {
+            return true;
+        }
+        #endregion
+
         #endregion
 
 
@@ -113,6 +127,8 @@ namespace GetBeamTopLines.ViewModels
             SelectBeamFaceCommand = new LambdaCommand(OnSelectBeamFaceCommandExecuted, CanSelectBeamFaceCommandExecute);
 
             SaveBeamLinesCommand = new LambdaCommand(OnSaveBeamLinesCommandExecuted, CanSaveBeamLinesCommandExecute);
+
+            CloseWindowCommand = new LambdaCommand(OnCloseWindowCommandExecuted, CanCloseWindowCommandExecute);
 
             #endregion
         }

@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:GetBeamTopLines"
         mc:Ignorable="d"
         Title="{Binding Title}"
-        Height="450"
+        Height="175"
         Width="350"
         Background="#f0f0f0"
         WindowStartupLocation="CenterScreen"

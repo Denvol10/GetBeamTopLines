@@ -111,7 +111,7 @@ namespace GetBeamTopLines
             using (Transaction trans = new Transaction(familyDocument, "Create lines"))
             {
                 trans.Start();
-                foreach(var beamLines in lines)
+                foreach (var beamLines in lines)
                 {
                     var lineList = new List<GeometryObject>();
                     lineList.AddRange(beamLines);

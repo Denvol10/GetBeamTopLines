@@ -89,7 +89,7 @@ namespace GetBeamTopLines.ViewModels
             RevitModel.GetFamilyInstanceByFamilySymbol(FamilySymbolName);
             RevitCommand.mainView.Hide();
             RevitModel.GetBeamTopLines();
-            RevitCommand.mainView.ShowDialog();
+            RevitCommand.mainView.Close();
         }
 
         private bool CanSaveBeamLinesCommandExecute(object parameter)

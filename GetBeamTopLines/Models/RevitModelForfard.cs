@@ -113,12 +113,15 @@ namespace GetBeamTopLines
                 trans.Start();
                 foreach (var beamLines in lines)
                 {
-                    var lineList = new List<GeometryObject>();
-                    lineList.AddRange(beamLines);
-                    DirectShape directShape = DirectShape.CreateElement(familyDocument, categoryId);
-                    if (directShape.IsValidShape(lineList))
+                    foreach (var line in beamLines)
                     {
-                        directShape.SetShape(lineList);
+                        var lineList = new List<GeometryObject>()
+                        { line };
+                        DirectShape directShape = DirectShape.CreateElement(familyDocument, categoryId);
+                        if (directShape.IsValidShape(lineList))
+                        {
+                            directShape.SetShape(lineList);
+                        }
                     }
                 }
                 trans.Commit();
